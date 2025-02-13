@@ -1,4 +1,4 @@
-package com.example.mp3_player.ui.theme
+package com.fallenstedt.mp3_player.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

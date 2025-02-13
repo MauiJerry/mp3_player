@@ -1,4 +1,4 @@
-package com.example.mp3_player.screens
+package com.fallenstedt.mp3_player.screens
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
@@ -11,8 +11,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
-import com.example.mp3_player.components.ListItem
-import com.example.mp3_player.services.MusicManager
+import com.fallenstedt.mp3_player.components.ListItem
+import com.fallenstedt.mp3_player.services.MusicManager
 import java.io.File
 
 @Composable

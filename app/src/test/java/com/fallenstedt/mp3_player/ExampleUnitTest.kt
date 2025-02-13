@@ -1,4 +1,4 @@
-package com.example.mp3_player
+package com.fallenstedt.mp3_player
 
 import org.junit.Test
 

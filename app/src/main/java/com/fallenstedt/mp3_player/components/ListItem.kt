@@ -1,4 +1,4 @@
-package com.example.mp3_player.components
+package com.fallenstedt.mp3_player.components
 
 import android.graphics.pdf.models.ListItem
 import androidx.compose.foundation.clickable

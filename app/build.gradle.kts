@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mp3_player"
+    namespace = "com.fallenstedt.mp3_player"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mp3_player"
+        applicationId = "com.fallenstedt.mp3_player"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

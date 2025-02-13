@@ -1,4 +1,4 @@
-package com.example.mp3_player.screens
+package com.fallenstedt.mp3_player.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

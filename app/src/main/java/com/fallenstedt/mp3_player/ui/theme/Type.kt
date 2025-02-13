@@ -1,4 +1,4 @@
-package com.example.mp3_player.ui.theme
+package com.fallenstedt.mp3_player.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

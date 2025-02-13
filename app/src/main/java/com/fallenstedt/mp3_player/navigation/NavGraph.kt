@@ -1,4 +1,4 @@
-package com.example.mp3_player.navigation
+package com.fallenstedt.mp3_player.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mp3_player.screens.ListScreen
-import com.example.mp3_player.screens.PlayerScreen
+import com.fallenstedt.mp3_player.screens.ListScreen
+import com.fallenstedt.mp3_player.screens.PlayerScreen
 
 @Composable
 fun AppNavigation() {

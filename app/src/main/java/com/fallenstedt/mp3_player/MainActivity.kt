@@ -1,4 +1,4 @@
-package com.example.mp3_player
+package com.fallenstedt.mp3_player
 
 import android.os.Build
 import android.os.Bundle
@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.mp3_player.navigation.AppNavigation
-import com.example.mp3_player.ui.theme.Mp3_playerTheme
+import com.fallenstedt.mp3_player.navigation.AppNavigation
+import com.fallenstedt.mp3_player.ui.theme.Mp3_playerTheme
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
