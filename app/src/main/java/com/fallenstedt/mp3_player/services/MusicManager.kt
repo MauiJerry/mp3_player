@@ -28,7 +28,6 @@ class MusicManager {
     fun buildPlayer(context: Context, filePath: String): ExoPlayer {
         val player = ExoPlayer.Builder(context).build()
         player.setMediaItem(MediaItem.fromUri(filePath))
-
         player.prepare()
         return player
     }
