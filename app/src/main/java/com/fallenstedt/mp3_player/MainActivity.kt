@@ -27,9 +27,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         if (hasStoragePermission()) {
-            startApp() // Proceed if permission is granted
+            startApp()
         } else {
-            requestStoragePermission() // Ask for permission first
+            requestStoragePermission()
         }
     }
 

@@ -1,6 +1,8 @@
 package com.fallenstedt.mp3_player.screens
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,7 +46,8 @@ fun ListScreen(navController: NavController, context: Context) {
           if (selectedFile.isDirectory) {
             currentDirectory.value = selectedFile
           } else {
-            navController.navigate("playerScreen?filePath=${selectedFile.path}")
+            Log.d("NavigationDebug", "Navigating to: playerScreen?filePath${Uri.encode(selectedFile.path)}")
+            navController.navigate("playerScreen?filePath=${Uri.encode(selectedFile.path)}")
           }
         }
       }
