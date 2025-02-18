@@ -5,12 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import com.fallenstedt.mp3_player.navigation.AppNavigation
 import com.fallenstedt.mp3_player.ui.theme.Mp3_playerTheme
 import android.Manifest
 import android.app.AlertDialog
@@ -33,17 +27,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private fun startApp() {
         setContent {
             Mp3_playerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        AppNavigation()
-                    }
-                }
+                Mp3PlayerApp()
             }
         }
     }
