@@ -1,4 +1,4 @@
-package com.fallenstedt.mp3_player.components
+package com.fallenstedt.mp3_player.screens.list_screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -18,7 +18,7 @@ fun Item(text: String, onClick: (id: String) -> Unit, icon: ImageVector? = null)
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.fillMaxWidth().clickable { onClick(text) }) {
       if (icon != null) {
-        Icon(icon, contentDescription = "Localized description", modifier = Modifier.padding(start = 16.dp))
+        Icon(icon, contentDescription = text, modifier = Modifier.padding(start = 16.dp))
       }
       Text(text = text, modifier = Modifier.padding(16.dp))
     }

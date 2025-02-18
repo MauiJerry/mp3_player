@@ -4,12 +4,13 @@ import android.os.Environment
 import java.io.File
 
 class FileService {
+
     fun getMusicFiles(directory: File): List<File> {
         val musicFiles = mutableListOf<File>()
         if (directory.exists() && directory.isDirectory) {
             val files = directory.listFiles()
             files?.forEach { file ->
-                if (file.isDirectory || file.extension.equals("mp3", ignoreCase = true)) {
+                if (!file.name.startsWith(".")) {
                     musicFiles.add(file)
                 }
             }
