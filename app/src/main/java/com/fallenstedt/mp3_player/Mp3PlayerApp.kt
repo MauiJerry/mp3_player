@@ -26,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.fallenstedt.mp3_player.screens.file_screen.FileScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreenListItem
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreenViewModel
@@ -109,7 +110,6 @@ fun Mp3PlayerApp(
       startDestination = Mp3PlayerScreens.Start.name,
       modifier = Modifier
         .fillMaxSize()
-        .verticalScroll(rememberScrollState())
         .padding(innerPadding)
     ) {
       composable(route = Mp3PlayerScreens.Start.name) {
@@ -118,9 +118,10 @@ fun Mp3PlayerApp(
         }
       }
       composable(route = Mp3PlayerScreens.Files.name) {
-       ListScreen {
-         uiState.listItems
-       }
+        FileScreen(navController)
+//        ListScreen {
+//          uiState.listItems
+//        }
       }
       composable(route = Mp3PlayerScreens.Albums.name) {
         ListScreen {
