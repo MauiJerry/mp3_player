@@ -22,10 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.fallenstedt.mp3_player.screens.file_screen.FileScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreenListItem
@@ -66,11 +68,9 @@ fun Mp3PlayerApp(
 ) {
   // Get current back stack entry
   val backStackEntry by navController.currentBackStackEntryAsState()
+  val currentRoute = backStackEntry?.destination?.route ?: Mp3PlayerScreens.Start.name
   // Get the name of the current screen
-  val currentScreen = Mp3PlayerScreens.valueOf(
-    backStackEntry?.destination?.route ?: Mp3PlayerScreens.Start.name
-  )
-
+  val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
   when (currentScreen) {
@@ -117,11 +117,24 @@ fun Mp3PlayerApp(
           uiState.listItems
         }
       }
-      composable(route = Mp3PlayerScreens.Files.name) {
-        FileScreen(navController)
-//        ListScreen {
-//          uiState.listItems
-//        }
+      composable(
+        route = "${Mp3PlayerScreens.Files.name}?query={query}",
+        arguments = listOf(
+          navArgument("query") {
+            type = NavType.StringType
+            nullable = true
+            defaultValue = null
+         },
+        )
+      ) { backStackEntry ->
+        val query = backStackEntry.arguments?.getString("query")
+        Log.d("Mp3PlayerApp", "query: $query")
+
+
+        FileScreen(query = query, onItemClick = {  it ->
+          Log.d("Mp3PlayerApp", "it: $it")
+          navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it")
+         })
       }
       composable(route = Mp3PlayerScreens.Albums.name) {
         ListScreen {
@@ -140,4 +153,16 @@ fun Mp3PlayerApp(
       }
     }
   }
+}
+
+private fun getCurrentScreen(currentRoute: String): Mp3PlayerScreens {
+  val currentScreen = when {
+    currentRoute.startsWith(Mp3PlayerScreens.Files.name) -> Mp3PlayerScreens.Files
+    currentRoute.startsWith(Mp3PlayerScreens.Albums.name) -> Mp3PlayerScreens.Albums
+    currentRoute.startsWith(Mp3PlayerScreens.Artists.name) -> Mp3PlayerScreens.Artists
+    currentRoute.startsWith(Mp3PlayerScreens.Songs.name) -> Mp3PlayerScreens.Songs
+    currentRoute == Mp3PlayerScreens.Start.name -> Mp3PlayerScreens.Start
+    else -> Mp3PlayerScreens.Start
+  }
+  return currentScreen
 }

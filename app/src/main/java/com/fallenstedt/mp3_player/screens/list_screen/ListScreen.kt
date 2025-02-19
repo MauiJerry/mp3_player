@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ListScreen(
   modifier:Modifier = Modifier,
-
   fetchItems: () -> List<ListScreenListItem>,
 ) {
   val items = fetchItems()
