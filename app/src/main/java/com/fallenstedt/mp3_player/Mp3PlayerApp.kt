@@ -73,26 +73,6 @@ fun Mp3PlayerApp(
   val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
-  when (currentScreen) {
-    Mp3PlayerScreens.Start ->
-      listScreenViewModel.updateListItems(listOf(
-        Mp3PlayerScreens.Files,
-        Mp3PlayerScreens.Albums,
-        Mp3PlayerScreens.Artists,
-        Mp3PlayerScreens.Songs).map { item ->
-        ListScreenListItem(
-          text = stringResource(item.title),
-          onClick = { navController.navigate(it) },
-          icon = item.icon
-        )}.sortedBy { it.text })
-    Mp3PlayerScreens.Files ->
-
-      listScreenViewModel.updateListItems(listOf())
-
-    else -> {
-      listScreenViewModel.updateListItems(listOf())
-    }
-  }
 
   val uiState by listScreenViewModel.uiState.collectAsState()
   Scaffold(
@@ -114,7 +94,16 @@ fun Mp3PlayerApp(
     ) {
       composable(route = Mp3PlayerScreens.Start.name) {
         ListScreen {
-          uiState.listItems
+          listOf(
+            Mp3PlayerScreens.Files,
+            Mp3PlayerScreens.Albums,
+            Mp3PlayerScreens.Artists,
+            Mp3PlayerScreens.Songs).map { item ->
+            ListScreenListItem(
+              text = item.name,
+              onClick = { navController.navigate(it) },
+              icon = item.icon
+            )}.sortedBy { it.text }
         }
       }
       composable(
@@ -128,13 +117,10 @@ fun Mp3PlayerApp(
         )
       ) { backStackEntry ->
         val query = backStackEntry.arguments?.getString("query")
-        Log.d("Mp3PlayerApp", "query: $query")
-
-
-        FileScreen(query = query, onItemClick = {  it ->
-          Log.d("Mp3PlayerApp", "it: $it")
-          navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it")
-         })
+        FileScreen(
+          query = query,
+          onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
+        )
       }
       composable(route = Mp3PlayerScreens.Albums.name) {
         ListScreen {
