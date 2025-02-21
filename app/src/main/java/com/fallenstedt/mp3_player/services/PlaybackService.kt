@@ -1,6 +1,7 @@
 package com.fallenstedt.mp3_player.services
 
 import android.content.Intent
+import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -14,6 +15,7 @@ class PlaybackService: MediaSessionService() {
     super.onCreate()
     val player = ExoPlayer.Builder(this).build()
     mediaSession = MediaSession.Builder(this, player).build()
+    Log.d("Mp3PlayerApp", "Created PlaybackService")
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {

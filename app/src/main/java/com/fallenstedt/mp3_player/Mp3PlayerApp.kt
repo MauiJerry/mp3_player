@@ -1,5 +1,6 @@
 package com.fallenstedt.mp3_player
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -32,6 +34,7 @@ import com.fallenstedt.mp3_player.screens.file_screen.FileScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreen
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreenListItem
 import com.fallenstedt.mp3_player.screens.list_screen.ListScreenViewModel
+import com.fallenstedt.mp3_player.services.PlaybackService
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +76,10 @@ fun Mp3PlayerApp(
   val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
+  val context = LocalContext.current
+  fun startService() {
+    context.startService(Intent(context, PlaybackService::class.java))
+  }
 
   val uiState by listScreenViewModel.uiState.collectAsState()
   Scaffold(
@@ -119,6 +126,7 @@ fun Mp3PlayerApp(
         val query = backStackEntry.arguments?.getString("query")
         FileScreen(
           query = query,
+          startService = { startService() },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )
       }

@@ -12,10 +12,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.fallenstedt.mp3_player.services.PlaybackService
 
 class MainActivity : ComponentActivity() {
+
+    @Composable
+    fun startService() {
+        LocalContext.current.startService(Intent(this, PlaybackService::class.java))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
