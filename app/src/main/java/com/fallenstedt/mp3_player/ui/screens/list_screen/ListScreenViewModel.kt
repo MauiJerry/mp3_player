@@ -1,4 +1,4 @@
-package com.fallenstedt.mp3_player.screens.list_screen
+package com.fallenstedt.mp3_player.ui.screens.list_screen
 
 import androidx.lifecycle.ViewModel
 import com.fallenstedt.mp3_player.services.FileService

@@ -1,11 +1,8 @@
-package com.fallenstedt.mp3_player
+package com.fallenstedt.mp3_player.ui
 
-import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -30,11 +26,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.fallenstedt.mp3_player.screens.file_screen.FileScreen
-import com.fallenstedt.mp3_player.screens.list_screen.ListScreen
-import com.fallenstedt.mp3_player.screens.list_screen.ListScreenListItem
-import com.fallenstedt.mp3_player.screens.list_screen.ListScreenViewModel
-import com.fallenstedt.mp3_player.services.PlaybackService
+import com.fallenstedt.mp3_player.Mp3PlayerScreens
+import com.fallenstedt.mp3_player.R
+import com.fallenstedt.mp3_player.ui.screens.file_screen.FileScreen
+import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreen
+import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenListItem
+import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,11 +73,6 @@ fun Mp3PlayerApp(
   val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
-  val context = LocalContext.current
-  fun startService() {
-    context.startService(Intent(context, PlaybackService::class.java))
-  }
-
   val uiState by listScreenViewModel.uiState.collectAsState()
   Scaffold(
     topBar = {
@@ -100,17 +92,20 @@ fun Mp3PlayerApp(
         .padding(innerPadding)
     ) {
       composable(route = Mp3PlayerScreens.Start.name) {
+
         ListScreen {
           listOf(
             Mp3PlayerScreens.Files,
             Mp3PlayerScreens.Albums,
             Mp3PlayerScreens.Artists,
-            Mp3PlayerScreens.Songs).map { item ->
+            Mp3PlayerScreens.Songs
+          ).map { item ->
             ListScreenListItem(
               text = item.name,
               onClick = { navController.navigate(it) },
               icon = item.icon
-            )}.sortedBy { it.text }
+            )
+          }.sortedBy { it.text }
         }
       }
       composable(
@@ -126,7 +121,7 @@ fun Mp3PlayerApp(
         val query = backStackEntry.arguments?.getString("query")
         FileScreen(
           query = query,
-          startService = { startService() },
+          startService = {  },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )
       }

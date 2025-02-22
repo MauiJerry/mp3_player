@@ -1,4 +1,4 @@
-package com.fallenstedt.mp3_player.screens.file_screen
+package com.fallenstedt.mp3_player.ui.screens.file_screen
 
 import android.content.Intent
 import android.drm.DrmStore.Playback
@@ -11,8 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.fallenstedt.mp3_player.screens.list_screen.ListScreen
-import com.fallenstedt.mp3_player.screens.list_screen.ListScreenListItem
+import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreen
+import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenListItem
 import com.fallenstedt.mp3_player.services.FileService
 import com.fallenstedt.mp3_player.services.PlaybackService
 import java.io.File

@@ -12,18 +12,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.fallenstedt.mp3_player.services.PlaybackService
+import com.fallenstedt.mp3_player.ui.Mp3PlayerApp
 
 class MainActivity : ComponentActivity() {
 
-    @Composable
-    fun startService() {
-        LocalContext.current.startService(Intent(this, PlaybackService::class.java))
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +32,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startApp() {
+        val application = applicationContext as Mp3PlayerApplication
+        val mediaController = application.getMediaController()
+
         setContent {
             Mp3_playerTheme {
                 Mp3PlayerApp()
