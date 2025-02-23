@@ -16,5 +16,7 @@ enum class Mp3PlayerScreens(@StringRes val title: Int, val icon: ImageVector) {
   Albums(title = R.string.albums, icon = Icons.Filled.Album),
   Artists(title = R.string.artists, icon = Icons.Filled.Person),
   Songs(title = R.string.songs, icon = Icons.Filled.MusicNote),
+  Player(title = R.string.player, icon = Icons.Filled.MusicNote),
+
 }
 

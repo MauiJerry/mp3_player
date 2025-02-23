@@ -14,11 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,9 +29,9 @@ import androidx.navigation.navArgument
 import com.fallenstedt.mp3_player.Mp3PlayerScreens
 import com.fallenstedt.mp3_player.R
 import com.fallenstedt.mp3_player.ui.screens.file_screen.FileScreen
-import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreen
-import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenListItem
-import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenViewModel
+import com.fallenstedt.mp3_player.ui.components.list.ListScreen
+import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
+import com.fallenstedt.mp3_player.ui.screens.player_screen.PlayerScreen
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 
 
@@ -75,6 +74,14 @@ fun Mp3PlayerApp(
   val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
+
+  DisposableEffect(key1 = mediaControllerViewModel.mediaController) {
+    onDispose {
+      Log.d("Mp3PlayerApp", "onDispose")
+      mediaControllerViewModel.mediaController.release()
+    }
+  }
+
   Scaffold(
     topBar = {
       Mp3PlayerAppBar(
@@ -82,9 +89,8 @@ fun Mp3PlayerApp(
         canNavigateBack = navController.previousBackStackEntry != null,
         navigateUp = { navController.navigateUp() }
       )
-    }
+    },
   ) { innerPadding ->
-
     NavHost(
       navController = navController,
       startDestination = Mp3PlayerScreens.Start.name,
@@ -93,7 +99,6 @@ fun Mp3PlayerApp(
         .padding(innerPadding)
     ) {
       composable(route = Mp3PlayerScreens.Start.name) {
-
         ListScreen {
           listOf(
             Mp3PlayerScreens.Files,
@@ -122,11 +127,12 @@ fun Mp3PlayerApp(
         val query = backStackEntry.arguments?.getString("query")
         FileScreen(
           query = query,
-          loadSongs = { files, startIndex ->
+          onSongSelect = { files, startIndex ->
             mediaControllerViewModel.startPlaylist(
               files.map { MediaItem.fromUri(it.path) },
               startIndex
             )
+            navController.navigate(Mp3PlayerScreens.Player.name)
           },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )
@@ -146,6 +152,9 @@ fun Mp3PlayerApp(
           listOf()
         }
       }
+      composable(route = Mp3PlayerScreens.Player.name) {
+        PlayerScreen(mediaControllerViewModel = mediaControllerViewModel)
+      }
     }
   }
 }
@@ -156,6 +165,7 @@ private fun getCurrentScreen(currentRoute: String): Mp3PlayerScreens {
     currentRoute.startsWith(Mp3PlayerScreens.Albums.name) -> Mp3PlayerScreens.Albums
     currentRoute.startsWith(Mp3PlayerScreens.Artists.name) -> Mp3PlayerScreens.Artists
     currentRoute.startsWith(Mp3PlayerScreens.Songs.name) -> Mp3PlayerScreens.Songs
+    currentRoute.startsWith(Mp3PlayerScreens.Player.name) -> Mp3PlayerScreens.Player
     currentRoute == Mp3PlayerScreens.Start.name -> Mp3PlayerScreens.Start
     else -> Mp3PlayerScreens.Start
   }

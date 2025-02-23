@@ -22,6 +22,7 @@ import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 class MainActivity : ComponentActivity() {
   private lateinit var mediaControllerViewModel: MediaControllerViewModel
 
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()

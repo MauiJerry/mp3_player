@@ -4,5 +4,6 @@
     <string name="albums">Albums</string>
     <string name="artists">Artists</string>
     <string name="songs">Songs</string>
+    <string name="player">Player</string>
     <string name="back_button">Back</string>
 </resources>

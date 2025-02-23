@@ -9,7 +9,7 @@ import androidx.media3.session.MediaController
 
 class MediaControllerViewModel : ViewModel() {
   private lateinit var _mediaController: MediaController
-  private val mediaController: MediaController
+  val mediaController: MediaController
     get() = _mediaController
 
 
