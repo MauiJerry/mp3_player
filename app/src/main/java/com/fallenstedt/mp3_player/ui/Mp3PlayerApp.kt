@@ -122,12 +122,11 @@ fun Mp3PlayerApp(
         val query = backStackEntry.arguments?.getString("query")
         FileScreen(
           query = query,
-          loadSongs = { files ->
-            files
-              .map { MediaItem.fromUri(it.path) }
-              .forEach{ mediaControllerViewModel.addMediaItem(it) }
-            mediaControllerViewModel.prepare()
-            mediaControllerViewModel.play()
+          loadSongs = { files, startIndex ->
+            mediaControllerViewModel.startPlaylist(
+              files.map { MediaItem.fromUri(it.path) },
+              startIndex
+            )
           },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )

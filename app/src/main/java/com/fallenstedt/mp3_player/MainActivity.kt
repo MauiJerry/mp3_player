@@ -49,8 +49,6 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-
-
   }
 
   private fun hasStoragePermission(): Boolean {

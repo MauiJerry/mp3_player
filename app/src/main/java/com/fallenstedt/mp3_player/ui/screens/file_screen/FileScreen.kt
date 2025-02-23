@@ -18,22 +18,27 @@ import com.fallenstedt.mp3_player.services.PlaybackService
 import java.io.File
 
 @Composable
-fun FileScreen(query: String? = null, onItemClick: (id: String) -> Unit, loadSongs: (directory: List<File>) -> Unit) {
+fun FileScreen(
+  query: String? = null,
+  onItemClick: (id: String) -> Unit,
+  loadSongs: (directory: List<File>, index: Int) -> Unit
+) {
   val fileService = remember { FileService() }
 
   Log.d("Mp3PlayerApp", "query: $query")
 
   val directory = query?.let { File(it) } ?: fileService.getRootMusicDirectory()
-  val items =  fileService.getMusicFiles(
+  val files = fileService.getMusicFiles(
     directory = directory
-  ).map { file ->
+  )
+  val items =  files.map { file ->
     ListScreenListItem(
       text = file.name,
       onClick = {
         if (file.isDirectory()) {
           onItemClick(file.path)
         } else {
-          loadSongs(fileService.getMusicFiles(directory))
+          loadSongs(fileService.getMusicFiles(directory), files.indexOf(file))
           Log.d("Mp3PlayerApp", "Clicked an audio file ${file.name}")
         }
       }

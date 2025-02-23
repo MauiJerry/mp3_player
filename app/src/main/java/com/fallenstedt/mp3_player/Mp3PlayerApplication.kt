@@ -7,8 +7,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.fallenstedt.mp3_player.services.PlaybackService
 import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import java.util.concurrent.CompletableFuture
 
