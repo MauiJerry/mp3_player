@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -32,6 +33,7 @@ import com.fallenstedt.mp3_player.ui.screens.file_screen.FileScreen
 import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreen
 import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenListItem
 import com.fallenstedt.mp3_player.ui.screens.list_screen.ListScreenViewModel
+import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +66,7 @@ fun Mp3PlayerAppBar(
 @Composable
 fun Mp3PlayerApp(
   navController: NavHostController = rememberNavController(),
-  listScreenViewModel: ListScreenViewModel = viewModel(),
+  mediaControllerViewModel: MediaControllerViewModel
 ) {
   // Get current back stack entry
   val backStackEntry by navController.currentBackStackEntryAsState()
@@ -73,7 +75,6 @@ fun Mp3PlayerApp(
   val currentScreen = getCurrentScreen(currentRoute)
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
-  val uiState by listScreenViewModel.uiState.collectAsState()
   Scaffold(
     topBar = {
       Mp3PlayerAppBar(
@@ -121,23 +122,29 @@ fun Mp3PlayerApp(
         val query = backStackEntry.arguments?.getString("query")
         FileScreen(
           query = query,
-          startService = {  },
+          loadSongs = { files ->
+            files
+              .map { MediaItem.fromUri(it.path) }
+              .forEach{ mediaControllerViewModel.addMediaItem(it) }
+            mediaControllerViewModel.prepare()
+            mediaControllerViewModel.play()
+          },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )
       }
       composable(route = Mp3PlayerScreens.Albums.name) {
         ListScreen {
-          uiState.listItems
+          listOf()
         }
       }
       composable(route = Mp3PlayerScreens.Artists.name) {
         ListScreen {
-          uiState.listItems
+          listOf()
         }
       }
       composable(route = Mp3PlayerScreens.Songs.name) {
         ListScreen {
-          uiState.listItems
+          listOf()
         }
       }
     }

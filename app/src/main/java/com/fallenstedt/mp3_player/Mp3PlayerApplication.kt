@@ -10,12 +10,12 @@ import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import java.util.concurrent.CompletableFuture
 
 class Mp3PlayerApplication : Application() {
 
-  private var mediaController: MediaController? = null
   private val applicationJob = Job()
-  private val applicationScope = CoroutineScope(Dispatchers.Main + applicationJob)
+  private val mediaControllerFuture = CompletableFuture<MediaController>()
 
   override fun onCreate() {
     super.onCreate()
@@ -25,25 +25,17 @@ class Mp3PlayerApplication : Application() {
   private fun startService() {
     val sessionToken =
       SessionToken(this, ComponentName(this, PlaybackService::class.java))
-    val controllerFuture =
-      MediaController.Builder(this, sessionToken).buildAsync()
+    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
     controllerFuture.addListener({
-
-      mediaController = controllerFuture.get()
+      mediaControllerFuture.complete(controllerFuture.get())
       Log.d("Mp3PlayerApp", "Created Media Controller")
-
-    },
-    MoreExecutors.directExecutor())
-
+    }, MoreExecutors.directExecutor())
   }
 
-  fun getMediaController(): MediaController? {
-    return mediaController
+  fun getMediaControllerFuture(): CompletableFuture<MediaController> {
+    return mediaControllerFuture
   }
 
-  fun setMediaController(mediaController: MediaController) {
-    this.mediaController = mediaController
-  }
 
   override fun onTerminate() {
     super.onTerminate()
