@@ -15,13 +15,15 @@ class PlaybackService: MediaSessionService() {
     super.onCreate()
     val player = ExoPlayer.Builder(this).build()
     mediaSession = MediaSession.Builder(this, player).build()
-    Log.d("Mp3PlayerApp", "Created PlaybackService")
+    Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 
   override fun onTaskRemoved(rootIntent: Intent?) {
     val player = mediaSession?.player!!
     if (!player.playWhenReady || player.mediaItemCount == 0 || player.playbackState == Player.STATE_ENDED) {
       // Stop the service if not playing, continue playing in the background otherwise
+      Log.d("Mp3PlayerApp.PlaybackService", "Stopping service")
+
       stopSelf()
     }
   }
@@ -35,6 +37,8 @@ class PlaybackService: MediaSessionService() {
       player.release()
       release()
       mediaSession = null
+      Log.d("Mp3PlayerApp.PlaybackService", "player released")
+
     }
     super.onDestroy()
   }

@@ -75,13 +75,6 @@ fun Mp3PlayerApp(
   Log.d("Mp3PlayerApp", "Current screen: $currentScreen")
 
 
-  DisposableEffect(key1 = mediaControllerViewModel.mediaController) {
-    onDispose {
-      Log.d("Mp3PlayerApp", "onDispose")
-      mediaControllerViewModel.mediaController.release()
-    }
-  }
-
   Scaffold(
     topBar = {
       Mp3PlayerAppBar(

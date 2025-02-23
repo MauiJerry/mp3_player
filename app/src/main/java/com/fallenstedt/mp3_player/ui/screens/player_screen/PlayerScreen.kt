@@ -12,10 +12,6 @@ import androidx.annotation.OptIn
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.PlayerView.ARTWORK_DISPLAY_MODE_FILL
-import androidx.media3.ui.PlayerView.ArtworkDisplayMode
-
 
 @OptIn(UnstableApi::class)
 @Composable
