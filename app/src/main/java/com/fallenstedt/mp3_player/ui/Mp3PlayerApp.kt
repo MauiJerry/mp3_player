@@ -1,6 +1,8 @@
 package com.fallenstedt.mp3_player.ui
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -85,6 +87,16 @@ fun Mp3PlayerApp(
     },
   ) { innerPadding ->
     NavHost(
+      enterTransition = { slideIntoContainer(
+        AnimatedContentTransitionScope.SlideDirection.Start, tween(
+          150
+        )
+      ) },
+      exitTransition = { slideOutOfContainer(
+        AnimatedContentTransitionScope.SlideDirection.End, tween(
+          150
+        )
+      ) },
       navController = navController,
       startDestination = Mp3PlayerScreens.Start.name,
       modifier = Modifier

@@ -1,5 +1,6 @@
 package com.fallenstedt.mp3_player.services
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.util.Log
 import androidx.media3.common.AudioAttributes
@@ -24,7 +25,20 @@ class PlaybackService: MediaSessionService() {
         true
       )
     }
-    mediaSession = MediaSession.Builder(this, player).build()
+
+    val sessionActivityPendingIntent =
+      packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
+        PendingIntent.getActivity(
+          this,
+          0,
+          sessionIntent,
+          PendingIntent.FLAG_IMMUTABLE
+        )
+      }
+
+    mediaSession = MediaSession.Builder(this, player)
+      .setSessionActivity(sessionActivityPendingIntent!!)
+      .build()
     Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 
