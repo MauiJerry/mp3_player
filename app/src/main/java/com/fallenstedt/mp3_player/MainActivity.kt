@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import com.fallenstedt.mp3_player.ui.theme.Mp3_playerTheme
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -16,11 +17,17 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import com.fallenstedt.mp3_player.services.PlaybackService
 import com.fallenstedt.mp3_player.ui.Mp3PlayerApp
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
+import com.google.common.util.concurrent.MoreExecutors
+import java.util.concurrent.CompletableFuture
 
 class MainActivity : ComponentActivity() {
   private lateinit var mediaControllerViewModel: MediaControllerViewModel
+  private val mediaControllerFuture = CompletableFuture<MediaController>()
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,10 +41,19 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  private fun startApp() {
-    val application = applicationContext as Mp3PlayerApplication
-    val mediaControllerFuture = application.getMediaControllerFuture()
+  private fun startService() {
+    val sessionToken =
+      SessionToken(this, ComponentName(this, PlaybackService::class.java))
+    val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+    controllerFuture.addListener({
+      mediaControllerFuture.complete(controllerFuture.get())
+      Log.d("Mp3PlayerApp.Mp3PlayerApplication", "Created Media Controller")
+    }, MoreExecutors.directExecutor())
+  }
 
+
+  private fun startApp() {
+    startService()
     mediaControllerFuture.thenAccept{ mediaController ->
       mediaControllerViewModel = ViewModelProvider(this)[MediaControllerViewModel::class.java]
       mediaControllerViewModel.setMediaController(mediaController)
