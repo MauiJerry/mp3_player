@@ -4,11 +4,9 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
@@ -31,6 +29,8 @@ class MediaControllerViewModel : ViewModel() {
   val uiState: StateFlow<MediaUIState> = _uiState.asStateFlow()
   var hasPlaylistLoaded by mutableStateOf(false)
     private set
+  var isPlaying by mutableStateOf(false)
+    private set
   
   private val mediaPlayerListeners = object: Player.Listener {
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -38,6 +38,16 @@ class MediaControllerViewModel : ViewModel() {
       val (title, artist, album) = getSongInfo(mediaController)
 
       updateCurrentPlayingSong(title, album, artist)
+    }
+    override fun onEvents(player: Player, events: Player.Events){
+      if (events.containsAny(
+          Player.EVENT_PLAY_WHEN_READY_CHANGED,
+          Player.EVENT_PLAYBACK_STATE_CHANGED
+        )
+      ) {
+        updatePlayState(player)
+      }
+
     }
   }
   
@@ -59,6 +69,14 @@ class MediaControllerViewModel : ViewModel() {
     
     val (title, artist, album) = getSongInfo(mediaController)
     updateCurrentPlayingSong(title, album, artist)
+  }
+
+  private fun updatePlayState(player: Player) {
+    isPlaying = player.playWhenReady && player.playbackState == Player.STATE_READY
+    Log.d(
+      "Mp3PlayerApp.MediaControllerViewModel",
+      "Play state has changed. isPlaying: $isPlaying"
+    )
   }
 
   private fun generateMediaItems(

@@ -6,4 +6,6 @@
     <string name="songs">Songs</string>
     <string name="player">Player</string>
     <string name="back_button">Back</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
 </resources>
