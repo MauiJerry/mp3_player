@@ -1,0 +1,60 @@
+package com.fallenstedt.mp3_player.ui.components
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.fallenstedt.mp3_player.Mp3PlayerScreens
+import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
+
+@Composable
+fun Mp3PlayerBottomAppBar(
+  mediaControllerViewModel: MediaControllerViewModel,
+  currentScreen: Mp3PlayerScreens, modifier: Modifier = Modifier,
+  onNavigateToPlayer: () -> Unit
+) {
+  val mediaController = mediaControllerViewModel.mediaController
+  val playerUiState by mediaControllerViewModel.uiState.collectAsState()
+
+  // TODO play pause button customization https://developer.android.com/media/media3/ui/customization
+
+  AnimatedVisibility(visible = mediaControllerViewModel.hasPlaylistLoaded && currentScreen != Mp3PlayerScreens.Player) {
+    BottomAppBar(
+      modifier = modifier.clickable { onNavigateToPlayer() },
+      actions = {
+        Column(modifier = Modifier.padding(start= 16.dp))  {
+          Text(text=playerUiState.currentTitle, fontWeight = FontWeight.Bold)
+          Text(text=playerUiState.currentArtist)
+        }
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+          onClick = {  },
+          containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+          elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+        ) {
+          Icon(Icons.Filled.Add, "Localized description")
+        }
+      }
+    )
+  }
+}
