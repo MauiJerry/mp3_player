@@ -2,15 +2,19 @@ package com.fallenstedt.mp3_player.services
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
+import android.bluetooth.BluetoothDevice
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.fallenstedt.mp3_player.receivers.BluetoothReceiver
 
 class PlaybackService: MediaSessionService() {
+  private lateinit var bluetoothReceiver: BluetoothReceiver
   private var mediaSession: MediaSession? = null
 
 
@@ -39,6 +43,12 @@ class PlaybackService: MediaSessionService() {
     mediaSession = MediaSession.Builder(this, player)
       .setSessionActivity(sessionActivityPendingIntent!!)
       .build()
+
+    bluetoothReceiver = BluetoothReceiver(player)
+    val filter = IntentFilter().apply {
+      addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+    }
+    registerReceiver(bluetoothReceiver, filter)
     Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 

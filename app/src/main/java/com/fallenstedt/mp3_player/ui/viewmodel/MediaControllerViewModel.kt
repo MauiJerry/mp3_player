@@ -13,6 +13,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
+import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,7 @@ class MediaControllerViewModel : ViewModel() {
 
   private val _uiState = MutableStateFlow(MediaUIState())
   val uiState: StateFlow<MediaUIState> = _uiState.asStateFlow()
+
   var hasPlaylistLoaded by mutableStateOf(false)
     private set
   var isPlaying by mutableStateOf(false)
@@ -47,7 +49,6 @@ class MediaControllerViewModel : ViewModel() {
       ) {
         updatePlayState(player)
       }
-
     }
   }
   
@@ -59,8 +60,10 @@ class MediaControllerViewModel : ViewModel() {
   fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
 
+    val mediaItems = generateMediaItems(files, context)
+
     mediaController.clearMediaItems()
-    mediaController.addMediaItems(generateMediaItems(files, context))
+    mediaController.addMediaItems(mediaItems)
     mediaController.prepare()
     mediaController.seekToDefaultPosition(startIndex)
     mediaController.play()
@@ -69,6 +72,7 @@ class MediaControllerViewModel : ViewModel() {
     
     val (title, artist, album) = getSongInfo(mediaController)
     updateCurrentPlayingSong(title, album, artist)
+    updatePlaylist(mediaItems)
   }
 
   private fun updatePlayState(player: Player) {
@@ -85,6 +89,20 @@ class MediaControllerViewModel : ViewModel() {
   ) = files.map { file ->
     val metadata = getMetadataFromFile(context, file.toUri())
     MediaItem.Builder().setUri(file.toUri()).setMediaMetadata(metadata).build()
+  }
+
+  private fun updatePlaylist(mediaItems: List<MediaItem>) {
+    val playlist = mediaItems.mapIndexed { index, mediaItem -> ListScreenListItem(
+      text = mediaItem.mediaMetadata.title.toString(),
+      onClick = {
+        mediaController.seekTo(index, 0)
+        mediaController.play()
+      }) }
+    _uiState.update { currentState ->
+      currentState.copy(
+        playlist = playlist
+      )
+    }
   }
 
   private fun updateCurrentPlayingSong(currentTitle: String, currentAlbum: String, currentArtist: String) {
@@ -113,6 +131,7 @@ class MediaControllerViewModel : ViewModel() {
         .setAlbumTitle(album)
         .setTrackNumber(trackNo?.toInt())
         .build()
+
     } catch (e: Exception) {
       // Handle exceptions (e.g., file not found, unsupported format)
       Log.e("Mp3PlayerApp.MediaControllerViewModel", "Error extracting metadata: ${e.message}")

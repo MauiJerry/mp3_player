@@ -18,12 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Metadata
-import androidx.media3.common.Player
 import androidx.media3.common.util.RepeatModeUtil
 import androidx.media3.common.util.UnstableApi
 import com.fallenstedt.mp3_player.R
+import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -39,7 +37,6 @@ fun PlayerScreen(
     ResourcesCompat.getDrawable(context.resources, R.drawable.default_artwork, null)
   }
 
-  Log.d("Mp3PlayerApp.PlayerScreen", "${playerUiState}")
 
   Column (modifier = modifier){
     AndroidView(
@@ -69,6 +66,7 @@ fun PlayerScreen(
         playerView.player = mediaController
       }
     )
+    ListScreen { playerUiState.playlist }
   }
 
 }
