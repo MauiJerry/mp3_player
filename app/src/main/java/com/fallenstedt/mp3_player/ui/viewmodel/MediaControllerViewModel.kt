@@ -60,7 +60,7 @@ class MediaControllerViewModel : ViewModel() {
   fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
 
-    val mediaItems = generateMediaItems(files, context)
+    val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
 
     mediaController.clearMediaItems()
     mediaController.addMediaItems(mediaItems)
@@ -72,7 +72,7 @@ class MediaControllerViewModel : ViewModel() {
     
     val (title, artist, album) = getSongInfo(mediaController)
     updateCurrentPlayingSong(title, album, artist)
-    updatePlaylist(mediaItems)
+    updatePlaylist(listScreenListItems)
   }
 
   private fun updatePlayState(player: Player) {
@@ -86,21 +86,36 @@ class MediaControllerViewModel : ViewModel() {
   private fun generateMediaItems(
     files: List<File>,
     context: Context
-  ) = files.map { file ->
-    val metadata = getMetadataFromFile(context, file.toUri())
-    MediaItem.Builder().setUri(file.toUri()).setMediaMetadata(metadata).build()
+  ): Pair<List<MediaItem>, List<ListScreenListItem>> {
+    val mediaItems = mutableListOf<MediaItem>()
+    val listScreenListItems = mutableListOf<ListScreenListItem>()
+
+    files.forEachIndexed { index, file ->
+      val metadata = getMetadataFromFile(context, file.toUri())
+      val mediaItem = MediaItem.Builder()
+        .setUri(file.toUri())
+        .setMediaMetadata(metadata)
+        .build()
+      val listScreenListItem = ListScreenListItem(
+        text = metadata.title.toString(),
+        onClick = {
+          mediaController.seekTo(index, 0)
+          mediaController.play()
+        }
+      )
+
+
+      mediaItems.add(mediaItem)
+      listScreenListItems.add(listScreenListItem)
+    }
+
+    return Pair(mediaItems, listScreenListItems)
   }
 
-  private fun updatePlaylist(mediaItems: List<MediaItem>) {
-    val playlist = mediaItems.mapIndexed { index, mediaItem -> ListScreenListItem(
-      text = mediaItem.mediaMetadata.title.toString(),
-      onClick = {
-        mediaController.seekTo(index, 0)
-        mediaController.play()
-      }) }
+  private fun updatePlaylist(items: List<ListScreenListItem>) {
     _uiState.update { currentState ->
       currentState.copy(
-        playlist = playlist
+        playlist = items
       )
     }
   }

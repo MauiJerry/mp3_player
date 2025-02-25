@@ -19,7 +19,7 @@ fun FileScreen(
   Log.d("Mp3PlayerApp", "query: $query")
 
   val directory = query?.let { File(it) } ?: fileService.getRootMusicDirectory()
-  val files = fileService.getMusicFiles(
+  val files = fileService.getFiles(
     directory = directory
   )
   val items =  files.map { file ->
@@ -30,7 +30,7 @@ fun FileScreen(
           onItemClick(file.path)
         } else {
           Log.d("Mp3PlayerApp", "Clicked an audio file ${file.name}")
-          onSongSelect(fileService.getMusicFiles(directory), files.indexOf(file))
+          onSongSelect(fileService.getMusicFilesInDirectory(directory), files.indexOf(file))
         }
       }
     )

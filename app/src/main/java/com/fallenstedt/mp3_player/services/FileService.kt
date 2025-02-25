@@ -1,22 +1,33 @@
 package com.fallenstedt.mp3_player.services
 
 import android.os.Environment
+import android.util.Log
 import java.io.File
 
 class FileService {
-
-    fun getMusicFiles(directory: File): List<File> {
+    private fun getFilesInternal(directory: File, filter: (File) -> Boolean): List<File> {
         val musicFiles = mutableListOf<File>()
         if (directory.exists() && directory.isDirectory) {
             val files = directory.listFiles()
             files?.forEach { file ->
-                if (!file.name.startsWith(".")) {
+                if (filter(file)) {
+                    Log.d(
+                        "Mp3PlayerApp.FileService",
+                        "loading file ${file.name}, isDirectory ${file.isDirectory}"
+                    )
                     musicFiles.add(file)
                 }
             }
         }
-        val sortedMusicFiles = musicFiles.sortedBy { file -> file.name }
-        return sortedMusicFiles
+        return musicFiles.sortedBy { file -> file.name }
+    }
+
+    fun getFiles(directory: File): List<File> {
+        return getFilesInternal(directory) { file -> !file.name.startsWith(".") }
+    }
+
+    fun getMusicFilesInDirectory(directory: File): List<File> {
+        return getFilesInternal(directory) { file -> !file.name.startsWith(".") && file.isFile }
     }
 
     fun getRootMusicDirectory(): File {

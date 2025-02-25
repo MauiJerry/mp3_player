@@ -66,7 +66,8 @@ fun PlayerScreen(
         playerView.player = mediaController
       }
     )
-    ListScreen { playerUiState.playlist }
+    // TODO something is wrong with the key. Sometimes a key is null.
+//    ListScreen { playerUiState.playlist }
   }
 
 }
