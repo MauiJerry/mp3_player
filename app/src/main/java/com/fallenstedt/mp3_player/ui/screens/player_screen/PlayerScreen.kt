@@ -67,7 +67,7 @@ fun PlayerScreen(
       }
     )
     // TODO something is wrong with the key. Sometimes a key is null.
-//    ListScreen { playerUiState.playlist }
+    ListScreen { playerUiState.playlist }
   }
 
 }

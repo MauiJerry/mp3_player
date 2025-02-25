@@ -101,6 +101,7 @@ fun Mp3PlayerApp(
             Mp3PlayerScreens.Songs
           ).map { item ->
             ListScreenListItem(
+              key = item.name,
               text = item.name,
               onClick = { navController.navigate(it) },
               icon = item.icon
@@ -122,14 +123,13 @@ fun Mp3PlayerApp(
         FileScreen(
           query = query,
           onSongSelect = { files, startIndex ->
-            coroutineScope.launch {
-              mediaControllerViewModel.startPlaylist(
-                context,
-                files,
-                startIndex
-              )
-              navController.navigate(Mp3PlayerScreens.Player.name)
-            }
+            mediaControllerViewModel.startPlaylist(
+              context,
+              files,
+              startIndex
+            )
+            navController.navigate(Mp3PlayerScreens.Player.name)
+
           },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )

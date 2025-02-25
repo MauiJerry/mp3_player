@@ -7,6 +7,7 @@ import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import com.fallenstedt.mp3_player.services.FileService
 import java.io.File
+import java.util.UUID
 
 @Composable
 fun FileScreen(
@@ -24,6 +25,7 @@ fun FileScreen(
   )
   val items =  files.map { file ->
     ListScreenListItem(
+      key = UUID.randomUUID().toString(),
       text = file.name,
       onClick = {
         if (file.isDirectory()) {

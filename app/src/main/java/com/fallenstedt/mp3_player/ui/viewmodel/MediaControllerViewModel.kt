@@ -2,7 +2,6 @@ package com.fallenstedt.mp3_player.ui.viewmodel
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.io.File
-
+import java.util.UUID
 
 class MediaControllerViewModel : ViewModel() {
   private lateinit var _mediaController: MediaController
@@ -91,19 +90,19 @@ class MediaControllerViewModel : ViewModel() {
     val listScreenListItems = mutableListOf<ListScreenListItem>()
 
     files.forEachIndexed { index, file ->
-      val metadata = getMetadataFromFile(context, file.toUri())
+      val metadata = getMetadataFromFile(context, file)
       val mediaItem = MediaItem.Builder()
         .setUri(file.toUri())
         .setMediaMetadata(metadata)
         .build()
       val listScreenListItem = ListScreenListItem(
+        key = UUID.randomUUID().toString(),
         text = metadata.title.toString(),
         onClick = {
           mediaController.seekTo(index, 0)
           mediaController.play()
         }
       )
-
 
       mediaItems.add(mediaItem)
       listScreenListItems.add(listScreenListItem)
@@ -130,12 +129,12 @@ class MediaControllerViewModel : ViewModel() {
     }
   }
 
-  private fun getMetadataFromFile(context: Context, fileUri: Uri): MediaMetadata {
+  private fun getMetadataFromFile(context: Context, file: File): MediaMetadata {
     val retriever = MediaMetadataRetriever()
     try {
-      retriever.setDataSource(context, fileUri)
+      retriever.setDataSource(context, file.toUri())
 
-      val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+      val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.name
       val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
       val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
       val trackNo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)
@@ -148,7 +147,6 @@ class MediaControllerViewModel : ViewModel() {
         .build()
 
     } catch (e: Exception) {
-      // Handle exceptions (e.g., file not found, unsupported format)
       Log.e("Mp3PlayerApp.MediaControllerViewModel", "Error extracting metadata: ${e.message}")
       return MediaMetadata.EMPTY
     } finally {

@@ -1,9 +1,12 @@
 package com.fallenstedt.mp3_player.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -39,7 +42,7 @@ fun Mp3PlayerBottomAppBar(
       modifier = modifier.clickable { onNavigateToPlayer() },
       actions = {
         Column(modifier = Modifier.padding(start= 16.dp))  {
-          Text(text=playerUiState.currentTitle, fontWeight = FontWeight.Bold)
+          Text(text=playerUiState.currentTitle, fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.basicMarquee())
           Text(text=playerUiState.currentArtist)
         }
       },

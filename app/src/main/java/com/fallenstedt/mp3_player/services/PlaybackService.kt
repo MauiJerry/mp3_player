@@ -44,11 +44,11 @@ class PlaybackService: MediaSessionService() {
       .setSessionActivity(sessionActivityPendingIntent!!)
       .build()
 
-//    bluetoothReceiver = BluetoothReceiver(player)
-//    val filter = IntentFilter().apply {
-//      addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-//    }
-//    registerReceiver(bluetoothReceiver, filter)
+    bluetoothReceiver = BluetoothReceiver(player)
+    val filter = IntentFilter().apply {
+      addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+    }
+    registerReceiver(bluetoothReceiver, filter)
     Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 
