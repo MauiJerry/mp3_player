@@ -15,6 +15,7 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,10 +47,12 @@ fun Mp3PlayerBottomAppBar(
           Text(text=playerUiState.currentArtist)
         }
       },
+      containerColor = MaterialTheme.colorScheme.surfaceVariant,
       floatingActionButton = {
         FloatingActionButton(
+          containerColor = MaterialTheme.colorScheme.onSurface,
+          contentColor = MaterialTheme.colorScheme.surface,
           onClick = { if (isPlaying) mediaController.pause() else { mediaController.play() } },
-          containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
           elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
         ) {
           if (isPlaying) {

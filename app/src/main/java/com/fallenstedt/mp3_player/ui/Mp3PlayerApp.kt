@@ -123,13 +123,12 @@ fun Mp3PlayerApp(
         FileScreen(
           query = query,
           onSongSelect = { files, startIndex ->
+            navController.navigate(Mp3PlayerScreens.Player.name)
             mediaControllerViewModel.startPlaylist(
               context,
               files,
               startIndex
             )
-            navController.navigate(Mp3PlayerScreens.Player.name)
-
           },
           onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
         )

@@ -24,10 +24,11 @@ fun Mp3PlayerAppBar(
   navigateUp: () -> Unit,
   modifier: Modifier = Modifier
 ) {
+
   TopAppBar(
     title = { Text(stringResource(currentScreen.title)) },
-    colors = TopAppBarDefaults.mediumTopAppBarColors(
-      containerColor = MaterialTheme.colorScheme.primaryContainer
+    colors = TopAppBarDefaults.topAppBarColors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
     ),
     modifier = modifier,
     navigationIcon = {

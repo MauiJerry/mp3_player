@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.fallenstedt.mp3_player.ui.theme.Mp3_playerTheme
 import android.Manifest
 import android.app.AlertDialog
 import android.content.ComponentName
@@ -21,6 +20,7 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.fallenstedt.mp3_player.services.PlaybackService
 import com.fallenstedt.mp3_player.ui.Mp3PlayerApp
+import com.fallenstedt.mp3_player.ui.theme.AppTheme
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.CompletableFuture
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
 
       runOnUiThread {
         setContent {
-          Mp3_playerTheme {
+          AppTheme(dynamicColor = false) {
             Mp3PlayerApp(mediaControllerViewModel = mediaControllerViewModel)
           }
         }

@@ -37,12 +37,12 @@ fun PlayerScreen(
     ResourcesCompat.getDrawable(context.resources, R.drawable.default_artwork, null)
   }
 
-
   Column (modifier = modifier){
     AndroidView(
       modifier = Modifier.fillMaxHeight(0.5f),
       factory = {
         PlayerView(context).apply {
+          videoSurfaceView
           layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
