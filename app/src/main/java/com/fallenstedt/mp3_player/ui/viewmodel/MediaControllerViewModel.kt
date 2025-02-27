@@ -3,6 +3,7 @@ package com.fallenstedt.mp3_player.ui.viewmodel
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.util.Log
+import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +48,7 @@ class MediaControllerViewModel : ViewModel() {
           Player.EVENT_PLAYBACK_STATE_CHANGED
         )
       ) {
-        updatePlayState(player)
+        updatePlayState()
       }
     }
   }
@@ -60,6 +62,7 @@ class MediaControllerViewModel : ViewModel() {
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
 
     val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
+    listScreenListItems[startIndex].emphasize = true
 
     mediaController.clearMediaItems()
     mediaController.addMediaItems(mediaItems)
@@ -74,12 +77,30 @@ class MediaControllerViewModel : ViewModel() {
     updatePlaylist(listScreenListItems)
   }
 
-  private fun updatePlayState(player: Player) {
-    isPlaying = player.playWhenReady && player.playbackState == Player.STATE_READY
+  private fun updatePlayState() {
+    isPlaying = mediaController.playWhenReady && mediaController.playbackState == Player.STATE_READY
+    _uiState.update { currentState ->
+      currentState.copy(
+        playlist = emphasizeNextSong(currentState)
+      )
+    }
     Log.d(
       "Mp3PlayerApp.MediaControllerViewModel",
       "Play state has changed. isPlaying: $isPlaying"
     )
+  }
+
+  private fun emphasizeNextSong(currentState: MediaUIState): List<ListScreenListItem> {
+    val stateCopy = currentState.copy()
+    val prevEmphasizeIndex = stateCopy.playlist.indexOfFirst { it.emphasize == true }
+    if (prevEmphasizeIndex > -1) {
+      stateCopy.playlist[prevEmphasizeIndex].emphasize = false
+    }
+    val nextIndex = mediaController.currentMediaItemIndex
+    if (nextIndex > -1) {
+      stateCopy.playlist[nextIndex].emphasize = true
+    }
+    return stateCopy.playlist
   }
 
   private fun generateMediaItems(
@@ -98,6 +119,7 @@ class MediaControllerViewModel : ViewModel() {
       val listScreenListItem = ListScreenListItem(
         key = UUID.randomUUID().toString(),
         text = metadata.title.toString(),
+        subtext = metadata.artist.toString(),
         onClick = {
           mediaController.seekTo(index, 0)
           mediaController.play()

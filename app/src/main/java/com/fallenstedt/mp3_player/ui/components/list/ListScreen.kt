@@ -34,7 +34,12 @@ fun ListScreen(
     }
     LazyColumn {
       items(items, key = { item -> item.key }) {
-          item -> Item(text = item.text, onClick = item.onClick, icon = item.icon)
+          item -> Item(
+          text = item.text,
+          subtext = item.subtext,
+          onClick = item.onClick,
+          icon = item.icon,
+          emphasize = item.emphasize)
       }
     }
   }

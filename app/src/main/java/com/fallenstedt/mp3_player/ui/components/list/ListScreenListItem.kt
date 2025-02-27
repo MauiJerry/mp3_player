@@ -6,5 +6,7 @@ data class ListScreenListItem(
   val key: String,
   val text: String,
   val onClick: (id: String) -> Unit,
-  val icon: ImageVector? = null
-)
+  val icon: ImageVector? = null,
+  val subtext: String? = null,
+  var emphasize: Boolean? = false,
+  )
