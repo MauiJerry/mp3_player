@@ -1,26 +1,31 @@
 package com.fallenstedt.mp3_player.ui.screens.player_screen
 
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.media3.ui.PlayerView
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
-import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
-import androidx.media3.common.util.RepeatModeUtil
 import androidx.media3.common.util.UnstableApi
 import com.fallenstedt.mp3_player.R
+import com.fallenstedt.mp3_player.ui.components.PlayPauseButton
 import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 
 @OptIn(UnstableApi::class)
@@ -37,35 +42,59 @@ fun PlayerScreen(
     ResourcesCompat.getDrawable(context.resources, R.drawable.default_artwork, null)
   }
 
-  Column (modifier = modifier){
-    AndroidView(
-      modifier = Modifier.fillMaxHeight(0.5f),
-      factory = {
-        PlayerView(context).apply {
-          videoSurfaceView
-          layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-          )
-
-          useController = true
-          controllerAutoShow = true
-          defaultArtwork = defaultArtworkDrawable
-          setBackgroundColor(Color.Black.toArgb())
-          setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
-          setControllerShowTimeoutMs(0)
-          setShowFastForwardButton(false)
-          setShowRewindButton(false)
-          setShowShuffleButton(true)
-          setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL)
-          showController()
-          setKeepContentOnPlayerReset(true)
-        }
-      },
-      update = { playerView ->
-        playerView.player = mediaController
+  Column(modifier = modifier) {
+    Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+        .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+        .fillMaxWidth()
+    ) {
+      Column {
+        Text(
+          text = playerUiState.currentAlbum,
+          fontWeight = FontWeight.Bold,
+          fontSize = 18.sp,
+          modifier = Modifier.basicMarquee()
+        )
       }
-    )
+      PlayPauseButton(
+        containerColor = MaterialTheme.colorScheme.onSurface,
+        contentColor = MaterialTheme.colorScheme.surface,
+        onPlay = { mediaController.play() },
+        onPause = { mediaController.pause() },
+        isPlaying = mediaControllerViewModel.isPlaying,
+        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+      )
+    }
+//    AndroidView(
+//      modifier = Modifier.fillMaxHeight(0.5f),
+//      factory = {
+//        PlayerView(context).apply {
+//          videoSurfaceView
+//          layoutParams = ViewGroup.LayoutParams(
+//            ViewGroup.LayoutParams.MATCH_PARENT,
+//            ViewGroup.LayoutParams.MATCH_PARENT
+//          )
+//
+//          useController = true
+//          controllerAutoShow = true
+//          defaultArtwork = defaultArtworkDrawable
+//          setBackgroundColor(Color.Black.toArgb())
+//          setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+//          setControllerShowTimeoutMs(0)
+//          setShowFastForwardButton(false)
+//          setShowRewindButton(false)
+//          setShowShuffleButton(true)
+//          setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL)
+//          showController()
+//          setKeepContentOnPlayerReset(true)
+//        }
+//      },
+//      update = { playerView ->
+//        playerView.player = mediaController
+//      }
+//    )
     // TODO something is wrong with the key. Sometimes a key is null.
     ListScreen { playerUiState.playlist }
   }

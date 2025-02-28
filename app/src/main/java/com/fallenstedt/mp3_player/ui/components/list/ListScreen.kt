@@ -29,7 +29,7 @@ fun ListScreen(
         Text(text = title,
           fontWeight = FontWeight.Bold,
           fontSize=18.sp,
-          modifier = Modifier.padding(start = 16.dp))
+          modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp))
       }
     }
     LazyColumn {

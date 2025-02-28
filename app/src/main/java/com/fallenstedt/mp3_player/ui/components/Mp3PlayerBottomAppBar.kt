@@ -36,31 +36,31 @@ fun Mp3PlayerBottomAppBar(
 ) {
   val mediaController = mediaControllerViewModel.mediaController
   val playerUiState by mediaControllerViewModel.uiState.collectAsState()
-  val isPlaying = mediaControllerViewModel.isPlaying
 
-  AnimatedVisibility(visible = mediaControllerViewModel.hasPlaylistLoaded && currentScreen != Mp3PlayerScreens.Player) {
+  AnimatedVisibility(visible = mediaControllerViewModel.mediaController.mediaItemCount > 0 && currentScreen != Mp3PlayerScreens.Player) {
     BottomAppBar(
       modifier = modifier.clickable { onNavigateToPlayer() },
       actions = {
-        Column(modifier = Modifier.padding(start= 16.dp))  {
-          Text(text=playerUiState.currentTitle, fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.basicMarquee())
-          Text(text=playerUiState.currentArtist)
+        Column(modifier = Modifier.padding(start = 16.dp)) {
+          Text(
+            text = playerUiState.currentTitle,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            modifier = Modifier.basicMarquee()
+          )
+          Text(text = playerUiState.currentArtist)
         }
       },
       containerColor = MaterialTheme.colorScheme.surfaceVariant,
       floatingActionButton = {
-        FloatingActionButton(
+        PlayPauseButton(
           containerColor = MaterialTheme.colorScheme.onSurface,
           contentColor = MaterialTheme.colorScheme.surface,
-          onClick = { if (isPlaying) mediaController.pause() else { mediaController.play() } },
-          elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-        ) {
-          if (isPlaying) {
-            Icon(Icons.Filled.Pause, stringResource(R.string.pause))
-          } else {
-            Icon(Icons.Filled.PlayArrow, stringResource(R.string.play))
-          }
-        }
+          onPlay = { mediaController.play() },
+          onPause = { mediaController.pause() },
+          isPlaying = mediaControllerViewModel.isPlaying,
+          elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+        )
       }
     )
   }

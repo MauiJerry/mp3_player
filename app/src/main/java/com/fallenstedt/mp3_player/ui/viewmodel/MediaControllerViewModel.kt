@@ -30,8 +30,9 @@ class MediaControllerViewModel : ViewModel() {
   private val _uiState = MutableStateFlow(MediaUIState())
   val uiState: StateFlow<MediaUIState> = _uiState.asStateFlow()
 
-  var hasPlaylistLoaded by mutableStateOf(false)
-    private set
+//  var playlist by mutableStateOf(listOf<File>())
+//    private set
+
   var isPlaying by mutableStateOf(false)
     private set
   
@@ -58,8 +59,13 @@ class MediaControllerViewModel : ViewModel() {
     _mediaController.addListener(mediaPlayerListeners)
   }
 
+  fun selectSong(key: String) {
+
+  }
+
   fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
+
 
     val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
     listScreenListItems[startIndex].emphasize = true
@@ -70,8 +76,6 @@ class MediaControllerViewModel : ViewModel() {
     mediaController.seekToDefaultPosition(startIndex)
     mediaController.play()
 
-    hasPlaylistLoaded = mediaController.mediaItemCount > 0
-    
     val (title, artist, album) = getSongInfo(mediaController)
     updateCurrentPlayingSong(title, album, artist)
     updatePlaylist(listScreenListItems)

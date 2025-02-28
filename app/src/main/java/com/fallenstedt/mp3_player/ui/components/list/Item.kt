@@ -28,21 +28,30 @@ fun Item(
   emphasize: Boolean? = false,
   icon: ImageVector? = null,
   subtext: String? = null,
-  ) {
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.fillMaxWidth()
-        .background(
-          if (emphasize == true) MaterialTheme.colorScheme.primaryContainer else { Color.Unspecified })
-        .clickable { onClick(text) }) {
-      if (icon != null) {
-        Icon(icon, contentDescription = text, modifier = Modifier.padding(start = 16.dp))
-      }
-      Column (modifier = Modifier.padding(12.dp)) {
-        Text(text = text, fontWeight = FontWeight.Bold)
-        if (subtext != null) {
-          Text(text = subtext)
+) {
+  val fontWeight = if (emphasize == true) {
+    FontWeight.Bold
+  } else {
+    FontWeight.Normal
+  }
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier
+      .fillMaxWidth()
+      .background(
+        if (emphasize == true) MaterialTheme.colorScheme.primaryContainer else {
+          Color.Unspecified
         }
+      )
+      .clickable { onClick(text) }) {
+    if (icon != null) {
+      Icon(icon, contentDescription = text, modifier = Modifier.padding(start = 16.dp))
+    }
+    Column(modifier = Modifier.padding(12.dp)) {
+      Text(text = text, fontWeight = fontWeight)
+      if (subtext != null) {
+        Text(text = subtext)
       }
     }
+  }
 }
