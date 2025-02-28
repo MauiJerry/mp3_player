@@ -1,6 +1,9 @@
 # MP3 Player
 
-Renders and plays music found in your Android's `Music` directory. 
+Renders and plays music found in your Android device's `Music` directory. 
+
+![home](./images/home.png)
+![player](./images/player.png)
 
 ## Motivation
 
