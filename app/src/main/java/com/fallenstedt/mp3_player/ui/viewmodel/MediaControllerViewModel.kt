@@ -3,7 +3,6 @@ package com.fallenstedt.mp3_player.ui.viewmodel
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.util.Log
-import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import kotlinx.coroutines.flow.MutableStateFlow

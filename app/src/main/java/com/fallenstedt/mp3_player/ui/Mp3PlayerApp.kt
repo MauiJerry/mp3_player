@@ -1,30 +1,16 @@
 package com.fallenstedt.mp3_player.ui
 
 import android.util.Log
-import androidx.activity.result.launch
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.core.net.toUri
-import androidx.media3.common.MediaItem
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,7 +19,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.fallenstedt.mp3_player.Mp3PlayerScreens
-import com.fallenstedt.mp3_player.R
 import com.fallenstedt.mp3_player.ui.components.Mp3PlayerAppBar
 import com.fallenstedt.mp3_player.ui.components.Mp3PlayerBottomAppBar
 import com.fallenstedt.mp3_player.ui.screens.file_screen.FileScreen
@@ -41,7 +26,6 @@ import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import com.fallenstedt.mp3_player.ui.screens.player_screen.PlayerScreen
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
-import kotlinx.coroutines.launch
 
 
 
