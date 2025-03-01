@@ -8,15 +8,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.UUID
 
@@ -39,20 +43,39 @@ class MediaControllerViewModel : ViewModel() {
 
   fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
+    _uiState.update { currentState ->
+      currentState.copy(
+        isLoadingPlaylist = true
+      )
+    }
 
-    val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
-    listScreenListItems[startIndex].emphasize = true
+    viewModelScope.launch {
+      withContext(Dispatchers.IO) {
+        val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
 
-    mediaController.clearMediaItems()
-    mediaController.addMediaItems(mediaItems)
-    mediaController.prepare()
-    mediaController.seekToDefaultPosition(startIndex)
-    mediaController.play()
+        withContext(Dispatchers.Main) {
+          listScreenListItems[startIndex].emphasize = true
+          updatePlaylist(listScreenListItems)
 
-    val (title, artist, album) = getSongInfo(mediaController)
-    updateCurrentPlayingSong(title, album, artist)
-    updatePlaylist(listScreenListItems)
+          mediaController.clearMediaItems()
+          mediaController.addMediaItems(mediaItems)
+          mediaController.prepare()
+          mediaController.seekToDefaultPosition(startIndex)
+          mediaController.play()
+
+          val (title, artist, album) = getSongInfo(mediaController)
+          updateCurrentPlayingSong(title, album, artist)
+
+          _uiState.update { currentState ->
+            currentState.copy(
+              isLoadingPlaylist = false
+            )
+          }
+        }
+      }
+    }
   }
+
 
   private val mediaPlayerListeners = object: Player.Listener {
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -138,9 +161,9 @@ class MediaControllerViewModel : ViewModel() {
   }
 
   private fun updateCurrentPlayingSong(currentTitle: String, currentAlbum: String, currentArtist: String) {
-
     _uiState.update { currentState ->
       currentState.copy(
+        playlist = emphasizeNextSong(currentState),
         currentTitle = currentTitle,
         currentArtist = currentArtist,
         currentAlbum = currentAlbum

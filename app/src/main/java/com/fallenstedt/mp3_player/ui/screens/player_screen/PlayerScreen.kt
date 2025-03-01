@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
 import androidx.media3.common.util.UnstableApi
 import com.fallenstedt.mp3_player.R
+import com.fallenstedt.mp3_player.ui.components.LoadingScreen
 import com.fallenstedt.mp3_player.ui.components.PlayPauseButton
 import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 
@@ -40,6 +41,11 @@ fun PlayerScreen(
 
   val defaultArtworkDrawable: Drawable? = remember {
     ResourcesCompat.getDrawable(context.resources, R.drawable.default_artwork, null)
+  }
+
+  if (playerUiState.isLoadingPlaylist) {
+    LoadingScreen()
+    return
   }
 
   Column(modifier = modifier) {
