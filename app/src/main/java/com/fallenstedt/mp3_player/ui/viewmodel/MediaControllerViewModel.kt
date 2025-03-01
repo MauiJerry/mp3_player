@@ -141,7 +141,6 @@ class MediaControllerViewModel : ViewModel() {
 
     _uiState.update { currentState ->
       currentState.copy(
-        playlist = emphasizeNextSong(currentState),
         currentTitle = currentTitle,
         currentArtist = currentArtist,
         currentAlbum = currentAlbum
