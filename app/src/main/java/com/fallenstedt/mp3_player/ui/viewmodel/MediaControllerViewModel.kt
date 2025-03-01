@@ -28,12 +28,32 @@ class MediaControllerViewModel : ViewModel() {
   private val _uiState = MutableStateFlow(MediaUIState())
   val uiState: StateFlow<MediaUIState> = _uiState.asStateFlow()
 
-//  var playlist by mutableStateOf(listOf<File>())
-//    private set
-
   var isPlaying by mutableStateOf(false)
     private set
   
+
+  fun setMediaController(mediaController: MediaController) {
+    _mediaController = mediaController
+    _mediaController.addListener(mediaPlayerListeners)
+  }
+
+  fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
+    Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
+
+    val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
+    listScreenListItems[startIndex].emphasize = true
+
+    mediaController.clearMediaItems()
+    mediaController.addMediaItems(mediaItems)
+    mediaController.prepare()
+    mediaController.seekToDefaultPosition(startIndex)
+    mediaController.play()
+
+    val (title, artist, album) = getSongInfo(mediaController)
+    updateCurrentPlayingSong(title, album, artist)
+    updatePlaylist(listScreenListItems)
+  }
+
   private val mediaPlayerListeners = object: Player.Listener {
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
       super.onMediaItemTransition(mediaItem, reason)
@@ -50,46 +70,6 @@ class MediaControllerViewModel : ViewModel() {
         updatePlayState()
       }
     }
-  }
-  
-  fun setMediaController(mediaController: MediaController) {
-    _mediaController = mediaController
-    _mediaController.addListener(mediaPlayerListeners)
-  }
-
-  fun selectSong(key: String) {
-
-  }
-
-  fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
-    Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
-
-
-    val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
-    listScreenListItems[startIndex].emphasize = true
-
-    mediaController.clearMediaItems()
-    mediaController.addMediaItems(mediaItems)
-    mediaController.prepare()
-    mediaController.seekToDefaultPosition(startIndex)
-    mediaController.play()
-
-    val (title, artist, album) = getSongInfo(mediaController)
-    updateCurrentPlayingSong(title, album, artist)
-    updatePlaylist(listScreenListItems)
-  }
-
-  private fun updatePlayState() {
-    isPlaying = mediaController.playWhenReady && mediaController.playbackState == Player.STATE_READY
-    _uiState.update { currentState ->
-      currentState.copy(
-        playlist = emphasizeNextSong(currentState)
-      )
-    }
-    Log.d(
-      "Mp3PlayerApp.MediaControllerViewModel",
-      "Play state has changed. isPlaying: $isPlaying"
-    )
   }
 
   private fun emphasizeNextSong(currentState: MediaUIState): List<ListScreenListItem> {
@@ -143,9 +123,25 @@ class MediaControllerViewModel : ViewModel() {
     }
   }
 
-  private fun updateCurrentPlayingSong(currentTitle: String, currentAlbum: String, currentArtist: String) {
+
+  private fun updatePlayState() {
+    isPlaying = mediaController.playWhenReady && mediaController.playbackState == Player.STATE_READY
     _uiState.update { currentState ->
       currentState.copy(
+        playlist = emphasizeNextSong(currentState)
+      )
+    }
+    Log.d(
+      "Mp3PlayerApp.MediaControllerViewModel",
+      "Play state has changed. isPlaying: $isPlaying"
+    )
+  }
+
+  private fun updateCurrentPlayingSong(currentTitle: String, currentAlbum: String, currentArtist: String) {
+
+    _uiState.update { currentState ->
+      currentState.copy(
+        playlist = emphasizeNextSong(currentState),
         currentTitle = currentTitle,
         currentArtist = currentArtist,
         currentAlbum = currentAlbum
