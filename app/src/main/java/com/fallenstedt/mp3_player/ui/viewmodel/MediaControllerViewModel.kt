@@ -54,13 +54,17 @@ class MediaControllerViewModel : ViewModel() {
         val (mediaItems, listScreenListItems) = generateMediaItems(files, context)
 
         withContext(Dispatchers.Main) {
-          listScreenListItems[startIndex].emphasize = true
+          var index = startIndex
+          if (!isStartIndexValid(listScreenListItems, startIndex)) {
+            index = 0
+          }
+          listScreenListItems[index].emphasize = true
           updatePlaylist(listScreenListItems)
 
           mediaController.clearMediaItems()
           mediaController.addMediaItems(mediaItems)
           mediaController.prepare()
-          mediaController.seekToDefaultPosition(startIndex)
+          mediaController.seekToDefaultPosition(index)
           mediaController.play()
 
           val (title, artist, album) = getSongInfo(mediaController)
@@ -203,5 +207,9 @@ class MediaControllerViewModel : ViewModel() {
     val artist = currentMediaMetadata?.artist?.toString() ?: ""
     val album = currentMediaMetadata?.albumTitle?.toString() ?: ""
     return Triple(title, artist, album)
+  }
+
+  private fun isStartIndexValid(listScreenListItems: List<ListScreenListItem>, startIndex: Int): Boolean {
+    return startIndex >= 0 && startIndex < listScreenListItems.size
   }
 }

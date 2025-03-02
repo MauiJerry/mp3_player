@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
@@ -56,14 +57,16 @@ fun PlayerScreen(
         .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
         .fillMaxWidth()
     ) {
-      Column {
         Text(
-          text = playerUiState.currentAlbum,
+          text = playerUiState.currentAlbum + "lorem ipsum denatum lolol lorem ipsum denatum lolol lorem ipsum denatum lolol lorem ipsum denatum lolol ",
           fontWeight = FontWeight.Bold,
           fontSize = 18.sp,
-          modifier = Modifier.basicMarquee()
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier
+            .weight(1f)
+            .basicMarquee()
         )
-      }
       PlayPauseButton(
         containerColor = MaterialTheme.colorScheme.onSurface,
         contentColor = MaterialTheme.colorScheme.surface,

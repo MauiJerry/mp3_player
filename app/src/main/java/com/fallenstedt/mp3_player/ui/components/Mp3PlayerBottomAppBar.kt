@@ -38,7 +38,7 @@ fun Mp3PlayerBottomAppBar(
             maxLines = 1,
             modifier = Modifier.basicMarquee()
           )
-          Text(text = playerUiState.currentArtist)
+          Text(text = playerUiState.currentArtist, maxLines = 1, modifier = Modifier.basicMarquee())
         }
       },
       containerColor = MaterialTheme.colorScheme.surfaceVariant,
