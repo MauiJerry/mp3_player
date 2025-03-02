@@ -58,7 +58,7 @@ fun PlayerScreen(
         .fillMaxWidth()
     ) {
         Text(
-          text = playerUiState.currentAlbum + "lorem ipsum denatum lolol lorem ipsum denatum lolol lorem ipsum denatum lolol lorem ipsum denatum lolol ",
+          text = playerUiState.currentAlbum,
           fontWeight = FontWeight.Bold,
           fontSize = 18.sp,
           maxLines = 1,
