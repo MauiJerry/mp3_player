@@ -1,5 +1,6 @@
 package com.fallenstedt.mp3_player.ui
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
@@ -26,7 +27,8 @@ import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 import com.fallenstedt.mp3_player.ui.components.list.ListScreenListItem
 import com.fallenstedt.mp3_player.ui.screens.player_screen.PlayerScreen
 import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
-
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
@@ -103,9 +105,14 @@ fun Mp3PlayerApp(
          },
         )
       ) { backStackEntry ->
-        val query = backStackEntry.arguments?.getString("query")
+        val encodedQuery = backStackEntry.arguments?.getString("query")
+        val decodedQuery = if (encodedQuery != null) {
+          URLDecoder.decode(encodedQuery, StandardCharsets.UTF_8.toString())
+        } else {
+          null
+        }
         FileScreen(
-          query = query,
+          query = decodedQuery,
           onSongSelect = { files, startIndex ->
             navController.navigate(Mp3PlayerScreens.Player.name)
             mediaControllerViewModel.startPlaylist(
@@ -114,7 +121,9 @@ fun Mp3PlayerApp(
               startIndex
             )
           },
-          onItemClick = { navController.navigate("${Mp3PlayerScreens.Files.name}?query=$it") }
+          onItemClick = {
+            navController.navigate("${Mp3PlayerScreens.Files.name}?query=${Uri.encode(it)}")
+          }
         )
       }
       composable(route = Mp3PlayerScreens.Albums.name) {
