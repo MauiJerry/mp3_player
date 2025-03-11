@@ -27,6 +27,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.media3.common.util.UnstableApi
 import com.fallenstedt.mp3_player.R
 import com.fallenstedt.mp3_player.ui.components.LoadingScreen
+import com.fallenstedt.mp3_player.ui.components.MySlider
 import com.fallenstedt.mp3_player.ui.components.PlayPauseButton
 import com.fallenstedt.mp3_player.ui.components.list.ListScreen
 
@@ -76,35 +77,9 @@ fun PlayerScreen(
         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
       )
     }
-//    AndroidView(
-//      modifier = Modifier.fillMaxHeight(0.5f),
-//      factory = {
-//        PlayerView(context).apply {
-//          videoSurfaceView
-//          layoutParams = ViewGroup.LayoutParams(
-//            ViewGroup.LayoutParams.MATCH_PARENT,
-//            ViewGroup.LayoutParams.MATCH_PARENT
-//          )
-//
-//          useController = true
-//          controllerAutoShow = true
-//          defaultArtwork = defaultArtworkDrawable
-//          setBackgroundColor(Color.Black.toArgb())
-//          setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
-//          setControllerShowTimeoutMs(0)
-//          setShowFastForwardButton(false)
-//          setShowRewindButton(false)
-//          setShowShuffleButton(true)
-//          setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL)
-//          showController()
-//          setKeepContentOnPlayerReset(true)
-//        }
-//      },
-//      update = { playerView ->
-//        playerView.player = mediaController
-//      }
-//    )
-    // TODO something is wrong with the key. Sometimes a key is null.
+    Row() {
+      MySlider(mediaControllerViewModel)
+    }
     ListScreen { playerUiState.playlist }
   }
 
