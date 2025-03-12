@@ -26,7 +26,7 @@ import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.CompletableFuture
 
 class MainActivity : ComponentActivity() {
-  private lateinit var mediaControllerViewModel: MediaControllerViewModel
+  private var mediaControllerViewModel: MediaControllerViewModel? = null
   private val mediaControllerFuture = CompletableFuture<MediaController>()
 
 
@@ -38,6 +38,16 @@ class MainActivity : ComponentActivity() {
       startApp()
     } else {
       requestStoragePermission()
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    if (mediaControllerViewModel != null) {
+      if (mediaControllerViewModel!!.mediaController != null) {
+        mediaControllerViewModel!!.mediaController.release()
+
+      }
     }
   }
 
@@ -56,12 +66,12 @@ class MainActivity : ComponentActivity() {
     startService()
     mediaControllerFuture.thenAccept{ mediaController ->
       mediaControllerViewModel = ViewModelProvider(this)[MediaControllerViewModel::class.java]
-      mediaControllerViewModel.setMediaController(mediaController)
+      mediaControllerViewModel!!.setMediaController(mediaController)
 
       runOnUiThread {
         setContent {
           AppTheme(dynamicColor = false) {
-            Mp3PlayerApp(mediaControllerViewModel = mediaControllerViewModel)
+            Mp3PlayerApp(mediaControllerViewModel = mediaControllerViewModel!!)
           }
         }
       }

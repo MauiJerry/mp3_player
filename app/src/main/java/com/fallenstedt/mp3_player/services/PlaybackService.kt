@@ -16,7 +16,7 @@ import com.fallenstedt.mp3_player.receivers.BluetoothReceiver
 class PlaybackService: MediaSessionService() {
   private lateinit var bluetoothReceiver: BluetoothReceiver
   private var mediaSession: MediaSession? = null
-
+  private var isReceiverRegistered = false
 
   override fun onCreate() {
     super.onCreate()
@@ -45,10 +45,8 @@ class PlaybackService: MediaSessionService() {
       .build()
 
     bluetoothReceiver = BluetoothReceiver(player)
-    val filter = IntentFilter().apply {
-      addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-    }
-    registerReceiver(bluetoothReceiver, filter)
+
+    registerReceiverIfNeeded()
     Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 
@@ -74,7 +72,26 @@ class PlaybackService: MediaSessionService() {
       Log.d("Mp3PlayerApp.PlaybackService", "player released")
 
     }
+    unregisterReceiverIfNeeded()
     super.onDestroy()
+  }
+
+
+  private fun unregisterReceiverIfNeeded() {
+    if (isReceiverRegistered) {
+      unregisterReceiver(bluetoothReceiver)
+      isReceiverRegistered = false
+    }
+  }
+
+  private fun registerReceiverIfNeeded() {
+    if (!isReceiverRegistered) {
+      val filter = IntentFilter().apply {
+        addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+      }
+        registerReceiver(bluetoothReceiver, filter)
+      isReceiverRegistered = true
+    }
   }
 
 }
