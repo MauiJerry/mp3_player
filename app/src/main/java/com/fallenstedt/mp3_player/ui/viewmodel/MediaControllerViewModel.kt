@@ -153,14 +153,6 @@ class MediaControllerViewModel : ViewModel() {
       if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
         onIsPlayingChanged(_mediaController.isPlaying)
       }
-//      if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
-//        onPositionDiscontinuity(
-//          player.currentPositionInfo,
-//          player.currentPositionInfo,
-//          Player.DISCONTINUITY_REASON_SEEK
-//        )
-//      }
-
       if (events.containsAny(
           Player.EVENT_PLAY_WHEN_READY_CHANGED,
           Player.EVENT_PLAYBACK_STATE_CHANGED
@@ -245,6 +237,11 @@ class MediaControllerViewModel : ViewModel() {
         currentAlbum = currentAlbum
       )
     }
+
+    if (mediaController.duration > 0) {
+      duration = mediaController.duration.toFloat()
+    }
+
   }
 
   private fun getMetadataFromFile(context: Context, file: File): MediaMetadata {
