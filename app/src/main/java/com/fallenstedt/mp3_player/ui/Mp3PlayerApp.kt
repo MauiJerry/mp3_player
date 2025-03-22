@@ -82,9 +82,9 @@ fun Mp3PlayerApp(
         ListScreen {
           listOf(
             Mp3PlayerScreens.Files,
-            Mp3PlayerScreens.Albums,
-            Mp3PlayerScreens.Artists,
-            Mp3PlayerScreens.Songs
+//            Mp3PlayerScreens.Albums,
+//            Mp3PlayerScreens.Artists,
+//            Mp3PlayerScreens.Songs
           ).map { item ->
             ListScreenListItem(
               key = item.name,
@@ -142,7 +142,7 @@ fun Mp3PlayerApp(
         }
       }
       composable(route = Mp3PlayerScreens.Player.name) {
-        PlayerScreen(mediaControllerViewModel = mediaControllerViewModel)
+        PlayerScreen(mediaControllerViewModel = mediaControllerViewModel,  onNavigateToHome = { navController.navigate(Mp3PlayerScreens.Files.name)})
       }
     }
   }

@@ -30,12 +30,14 @@ import com.fallenstedt.mp3_player.ui.components.LoadingScreen
 import com.fallenstedt.mp3_player.ui.components.MySlider
 import com.fallenstedt.mp3_player.ui.components.PlayPauseButton
 import com.fallenstedt.mp3_player.ui.components.list.ListScreen
+import java.io.File
 
 @OptIn(UnstableApi::class)
 @Composable
 fun PlayerScreen(
   modifier: Modifier = Modifier,
-  mediaControllerViewModel: MediaControllerViewModel
+  mediaControllerViewModel: MediaControllerViewModel,
+  onNavigateToHome: () -> Unit
 ) {
   val context = LocalContext.current
   val mediaController = mediaControllerViewModel.mediaController
@@ -47,6 +49,10 @@ fun PlayerScreen(
 
   if (playerUiState.isLoadingPlaylist) {
     LoadingScreen()
+    return
+  }
+  if (playerUiState.playlist.isEmpty()) {
+    onNavigateToHome()
     return
   }
 
