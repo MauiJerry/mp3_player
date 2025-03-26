@@ -1,24 +1,24 @@
 package com.fallenstedt.mp3_player
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
-import androidx.compose.material3.*
-import java.io.File
-import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
-import com.fallenstedt.mp3_player.services.FileService
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import android.Manifest
-import android.app.AlertDialog
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.*
+import android.app.AlertDialog as AlertDialogAndroid
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.session.MediaController
@@ -26,34 +26,31 @@ import androidx.media3.session.SessionToken
 import com.fallenstedt.mp3_player.services.PlaybackService
 import com.fallenstedt.mp3_player.ui.Mp3PlayerApp
 import com.fallenstedt.mp3_player.ui.theme.AppTheme
+import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.CompletableFuture
-import kotlin.let as let1
 
 class MainActivity : ComponentActivity() {
   private var mediaControllerViewModel: MediaControllerViewModel? = null
   private val mediaControllerFuture = CompletableFuture<MediaController>()
-
+  private var showPermissionDialog by mutableStateOf(false)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
 
-    if (hasStoragePermission()) {
-      startApp()
-    } else {
-      requestStoragePermission()
+    setContent {
+      AppTheme(dynamicColor = false) {
+        PermissionRequestScreen {
+          startApp()
+        }
+      }
     }
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    if (mediaControllerViewModel != null) {
-      if (mediaControllerViewModel!!.mediaController != null) {
-        mediaControllerViewModel!!.mediaController.release()
-
-      }
-    }
+    mediaControllerViewModel?.mediaController?.release()
   }
 
   private fun startService() {
@@ -72,10 +69,8 @@ class MainActivity : ComponentActivity() {
       mediaControllerViewModel = ViewModelProvider(this)[MediaControllerViewModel::class.java]
       mediaControllerViewModel!!.setMediaController(mediaController)
 
-      runOnUiThread {
-        val viewModel = mediaControllerViewModel
-        if (viewModel != null) {
-          val fileService = FileService()
+      setContent {
+        mediaControllerViewModel?.let { viewModel ->
           viewModel.restorePlaybackState { files, index, position ->
             viewModel.startPlaylist(this, files, index)
             viewModel.mediaController.seekTo(position)
@@ -89,8 +84,7 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-
-    }
+  }
 
   private fun hasStoragePermission(): Boolean {
     val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -101,77 +95,61 @@ class MainActivity : ComponentActivity() {
     return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
   }
 
-
-  private fun requestStoragePermission() {
+  @Composable
+  fun PermissionRequestScreen(onPermissionGranted: () -> Unit) {
     val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       Manifest.permission.READ_MEDIA_AUDIO
     } else {
       Manifest.permission.READ_EXTERNAL_STORAGE
     }
-
-    when {
-      ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
-        return
-      }
-      ActivityCompat.shouldShowRequestPermissionRationale(this, permission) -> {
-        showPermissionRationaleDialog()
-      }
-      else -> {
-        ActivityCompat.requestPermissions(this, arrayOf(permission), REQUEST_CODE)
-      }
-    }
-  }
-
-  override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray,
-    deviceId: Int
-  ) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
-    if (requestCode == REQUEST_CODE) {
-      if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        startApp()
+    var hasPermission by remember { mutableStateOf(hasStoragePermission()) }
+    val launcher = rememberLauncherForActivityResult(
+      ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+      hasPermission = isGranted
+      if (isGranted) {
+        onPermissionGranted()
       } else {
-        // Permission denied, check if user selected "Don't ask again"
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-          showSettingsDialog()
-        } else {
-          showPermissionRationaleDialog()
-        }
+        showPermissionDialog = true
       }
     }
+
+    LaunchedEffect(Unit) {
+      if (!hasPermission) {
+        launcher.launch(permission)
+      } else {
+        onPermissionGranted()
+      }
+    }
+
+    if (showPermissionDialog){
+      showSettingsDialog { showPermissionDialog = false }
+    }
   }
-  private fun showPermissionRationaleDialog() {
-    AlertDialog.Builder(this)
-      .setTitle("Storage Permission Required")
-      .setMessage("This app needs access to your music directory to play songs.")
-      .setPositiveButton("OK") { _, _ ->
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-          Manifest.permission.READ_MEDIA_AUDIO
-        } else {
-          Manifest.permission.READ_EXTERNAL_STORAGE
+
+  @Composable
+  fun showSettingsDialog(onDismissRequest: () -> Unit) {
+    AlertDialog(
+      onDismissRequest = { onDismissRequest() },
+      title = { androidx.compose.material3.Text("Permission Denied") },
+      text = { androidx.compose.material3.Text("To enable music playback, allow access in Settings.") },
+      confirmButton = {
+        androidx.compose.material3.TextButton(onClick = {
+          val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+          intent.data = Uri.fromParts("package", packageName, null)
+          startActivity(intent)
+          onDismissRequest()
+        }) {
+          androidx.compose.material3.Text("Go to Settings")
         }
-        ActivityCompat.requestPermissions(this, arrayOf(permission), REQUEST_CODE)
+      },
+      dismissButton = {
+        androidx.compose.material3.TextButton(onClick = { onDismissRequest() }) {
+          androidx.compose.material3.Text("Cancel")
+        }
       }
-      .setNegativeButton("Cancel", null)
-      .show()
+    )
   }
-  private fun showSettingsDialog() {
-    AlertDialog.Builder(this)
-      .setTitle("Permission Denied")
-      .setMessage("To enable music playback, allow access in Settings.")
-      .setPositiveButton("Go to Settings") { _, _ ->
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        intent.data = Uri.fromParts("package", packageName, null)
-        startActivity(intent)
-      }
-      .setNegativeButton("Cancel", null)
-      .show()
-  }
-
-
-
   companion object {
     private const val REQUEST_CODE = 1001
   }
