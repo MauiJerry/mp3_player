@@ -1,4 +1,6 @@
 package com.fallenstedt.mp3_player.ui.viewmodel
+import android.annotation.SuppressLint
+import com.fallenstedt.mp3_player.services.PreferenceManager
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -29,6 +31,9 @@ import java.util.UUID
 
 
 class MediaControllerViewModel : ViewModel() {
+  private lateinit var preferenceManager: PreferenceManager
+  @SuppressLint("StaticFieldLeak")
+  private lateinit var context: Context
   private lateinit var _mediaController: MediaController
   val mediaController: MediaController
     get() = _mediaController
@@ -44,16 +49,37 @@ class MediaControllerViewModel : ViewModel() {
     private set
   
 
+  @SuppressLint("PrivateApi")
   fun setMediaController(mediaController: MediaController) {
+    context = mediaController.applicationLooper.thread.contextClassLoader?.loadClass("android.app.ActivityThread")
+      ?.getMethod("currentApplication")
+      ?.invoke(null) as Context
+    preferenceManager = PreferenceManager(context)
     _mediaController = mediaController
     _mediaController.addListener(mediaPlayerListeners)
   }
+  fun restorePlaybackState(onRestore: (List<File>, Int, Long) -> Unit) {
+    val playlistPaths = preferenceManager.getPlaylist()
+    val files = playlistPaths.mapNotNull { path ->
+      val file = File(path)
+      if (file.exists()) file else null
+    }
+    if (files.isNotEmpty()) {
+      val index = preferenceManager.getCurrentIndex().coerceIn(files.indices)
+      val position = preferenceManager.getPosition()
+      onRestore(files, index, position)
+    }
+  }
+
 
   fun seekTo(position: Long) {
     _mediaController.seekTo(position)
   }
 
   fun startPlaylist(context: Context, files: List<File>, startIndex: Int = 0) {
+    // Save playlist and index
+    preferenceManager.savePlaylist(files.map { it.absolutePath })
+    preferenceManager.saveCurrentIndex(startIndex)
     Log.d("Mp3PlayerApp.MediaControllerVM", "starting playlist at index $startIndex with ${files.count()} items")
     _uiState.update { currentState ->
       currentState.copy(
@@ -77,6 +103,7 @@ class MediaControllerViewModel : ViewModel() {
           mediaController.addMediaItems(mediaItems)
           mediaController.prepare()
           mediaController.seekToDefaultPosition(index)
+          preferenceManager.savePosition(mediaController.currentPosition)
           mediaController.play()
 
           val (title, artist, album) = getSongInfo(mediaController)
@@ -191,8 +218,8 @@ class MediaControllerViewModel : ViewModel() {
         .build()
       val listScreenListItem = ListScreenListItem(
         key = UUID.randomUUID().toString(),
-        text = metadata.title.toString(),
-        subtext = metadata.artist.toString(),
+        text = metadata.title?.takeIf { it.isNotBlank() }?.toString() ?: file.nameWithoutExtension,
+        subtext = metadata.artist?.toString() ?: "", // Explicitly convert to String
         onClick = {
           mediaController.seekTo(index, 0)
           mediaController.play()
@@ -205,7 +232,6 @@ class MediaControllerViewModel : ViewModel() {
 
     return Pair(mediaItems, listScreenListItems)
   }
-
   private fun updatePlaylist(items: List<ListScreenListItem>) {
     _uiState.update { currentState ->
       currentState.copy(
@@ -249,7 +275,7 @@ class MediaControllerViewModel : ViewModel() {
     try {
       retriever.setDataSource(context, file.toUri())
 
-      val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.name
+      val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: file.name.toString()
       val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
       val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
       val trackNo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER)

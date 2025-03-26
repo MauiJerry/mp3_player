@@ -2,8 +2,13 @@ package com.fallenstedt.mp3_player
 
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import java.io.File
+import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
+import com.fallenstedt.mp3_player.services.FileService
+import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import android.Manifest
 import android.app.AlertDialog
@@ -21,9 +26,9 @@ import androidx.media3.session.SessionToken
 import com.fallenstedt.mp3_player.services.PlaybackService
 import com.fallenstedt.mp3_player.ui.Mp3PlayerApp
 import com.fallenstedt.mp3_player.ui.theme.AppTheme
-import com.fallenstedt.mp3_player.ui.viewmodel.MediaControllerViewModel
 import com.google.common.util.concurrent.MoreExecutors
 import java.util.concurrent.CompletableFuture
+import kotlin.let as let1
 
 class MainActivity : ComponentActivity() {
   private var mediaControllerViewModel: MediaControllerViewModel? = null
@@ -61,22 +66,31 @@ class MainActivity : ComponentActivity() {
     }, MoreExecutors.directExecutor())
   }
 
-
   private fun startApp() {
     startService()
-    mediaControllerFuture.thenAccept{ mediaController ->
+    mediaControllerFuture.thenAccept { mediaController ->
       mediaControllerViewModel = ViewModelProvider(this)[MediaControllerViewModel::class.java]
       mediaControllerViewModel!!.setMediaController(mediaController)
 
       runOnUiThread {
-        setContent {
-          AppTheme(dynamicColor = false) {
-            Mp3PlayerApp(mediaControllerViewModel = mediaControllerViewModel!!)
+        val viewModel = mediaControllerViewModel
+        if (viewModel != null) {
+          val fileService = FileService()
+          viewModel.restorePlaybackState { files, index, position ->
+            viewModel.startPlaylist(this, files, index)
+            viewModel.mediaController.seekTo(position)
+
+            setContent {
+              AppTheme(dynamicColor = false) {
+                Mp3PlayerApp(mediaControllerViewModel = viewModel)
+              }
+            }
           }
         }
       }
     }
-  }
+
+    }
 
   private fun hasStoragePermission(): Boolean {
     val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

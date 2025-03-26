@@ -2,6 +2,8 @@
 
 Renders and plays music found in your Android device's `Music` directory. 
 
+Isdale Revisions: Optionally do AudioBooks folder and use short display names
+
 ![home](./images/home.png)
 ![player](./images/player.png)
 

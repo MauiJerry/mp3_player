@@ -1,6 +1,12 @@
 package com.fallenstedt.mp3_player.services
 
 import android.app.PendingIntent
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import android.app.Notification
+import androidx.core.app.NotificationCompat
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
@@ -13,6 +19,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.fallenstedt.mp3_player.receivers.BluetoothReceiver
 
+private val NOTIFICATION_CHANNEL_ID = "Mp3PlayerChannel"
+private val NOTIFICATION_ID = 101
 class PlaybackService: MediaSessionService() {
   private lateinit var bluetoothReceiver: BluetoothReceiver
   private var mediaSession: MediaSession? = null
@@ -20,6 +28,16 @@ class PlaybackService: MediaSessionService() {
 
   override fun onCreate() {
     super.onCreate()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channel = NotificationChannel(
+        NOTIFICATION_CHANNEL_ID,
+        "MP3 Player Playback",
+        NotificationManager.IMPORTANCE_LOW
+      )
+      val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+      manager.createNotificationChannel(channel)
+
+    }
     val player = ExoPlayer.Builder(this).build().apply {
       setAudioAttributes(
         AudioAttributes.Builder()
@@ -47,6 +65,7 @@ class PlaybackService: MediaSessionService() {
     bluetoothReceiver = BluetoothReceiver(player)
 
     registerReceiverIfNeeded()
+    startForeground(NOTIFICATION_ID, createNotification())
     Log.d("Mp3PlayerApp.PlaybackService", "Created PlaybackService")
   }
 
@@ -94,4 +113,17 @@ class PlaybackService: MediaSessionService() {
     }
   }
 
+
+  private fun createNotification(): Notification {
+    val intent = packageManager.getLaunchIntentForPackage(packageName)
+    val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+    return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+      .setContentTitle("Playing MP3")
+      .setContentText("Playback is running")
+      .setSmallIcon(android.R.drawable.ic_media_play)
+      .setContentIntent(pendingIntent)
+      .setOngoing(true)
+      .build()
+  }
 }

@@ -33,4 +33,8 @@ class FileService {
     fun getRootMusicDirectory(): File {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
     }
+
+    fun getRootAudioBooksDirectory(): File {
+        return Environment.getExternalStoragePublicDirectory("Audiobooks")
+    }
 }
